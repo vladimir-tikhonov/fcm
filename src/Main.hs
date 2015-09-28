@@ -19,7 +19,8 @@ spec = Opts
          (  long "output"
          <> short 'o'
          <> metavar "FILE"
-         <> help "Файл, куда будут записаны результаты" )
+         <> help "Файл, куда будут записаны результаты"
+         <> value "/dev/stdout" )
      <*> option auto
          (  long "clusters"
          <> short 'c'
@@ -30,7 +31,8 @@ spec = Opts
          (  long "metric"
          <> short 'm'
          <> metavar "NAME"
-         <> help "Используемая метрика" )
+         <> help "Используемая метрика"
+         <> value "euler" )
      <*> option auto
          (  long "precision"
          <> short 'p'
