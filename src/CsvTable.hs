@@ -1,8 +1,7 @@
 module CsvTable (
-  CsvTable,
   defaultCsvParserOpts,
   fromFile,
-  toDouble
+  toDoublesList
 ) where
 
 import qualified Data.ByteString.Lazy as BL
@@ -12,7 +11,6 @@ import qualified Data.Vector          as V
 
 type Row a = V.Vector a
 type Table a = V.Vector (Row a)
-data CsvTable a = CsvTable { rows :: Table a } deriving(Show)
 
 data CsvParserOpts = CsvParserOpts {  delimeter     :: Char
                                     , hasHeader     :: Bool
@@ -22,7 +20,7 @@ data CsvParserOpts = CsvParserOpts {  delimeter     :: Char
 defaultCsvParserOpts :: CsvParserOpts
 defaultCsvParserOpts = CsvParserOpts { delimeter = ',', hasHeader = False, noFirstColumn = False, noLastColumn = True }
 
-fromFile :: String -> CsvParserOpts -> IO (Either String (CsvTable String))
+fromFile :: String -> CsvParserOpts -> IO (Either String (Table String))
 fromFile path opts = do
    let decodeOpts = DecodeOptions { decDelimiter = fromIntegral (ord $ delimeter opts) }
    csvData <- BL.readFile path
@@ -32,11 +30,12 @@ fromFile path opts = do
    case result of Left err -> return (Left err)
                   Right v ->  do
                     let t = applyFirstColumnOpts opts $ applyLastColumnOpts opts v
-                    return (Right CsvTable { rows = (t :: Table String) })
+                    return (Right (t :: Table String) )
 
-toDouble :: CsvTable String -> CsvTable Double
-toDouble table =
-    CsvTable $ V.map (V.map $ \x -> read x :: Double) $ rows table
+toDoublesList :: Table String -> [[Double]]
+toDoublesList table =
+    V.toList $ V.map V.toList doublesV
+    where doublesV = V.map (V.map $ \x -> read x :: Double) $ table
 
 applyFirstColumnOpts :: CsvParserOpts -> Table a -> Table a
 applyFirstColumnOpts (CsvParserOpts _ _ False _) table = table

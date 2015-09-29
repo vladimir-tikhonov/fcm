@@ -1,14 +1,16 @@
 module Main where
 
 import           CsvTable
+import           Fcm
 import           Options.Applicative
 
 data Opts = Opts
   { input     :: String
   , output    :: String
   , clusters  :: Int
-  , metric    :: String
+  , metric    :: DistMethod
   , precision :: Double
+  , init      :: InitMethod
   } deriving(Show)
 
 spec :: Parser Opts
@@ -28,24 +30,30 @@ spec = Opts
          <> metavar "COUNT"
          <> help "Количество кластеров"
          <> value 5 )
-     <*> option str
+     <*> option auto
          (  long "metric"
          <> short 'm'
          <> metavar "NAME"
-         <> help "Используемая метрика"
-         <> value "euler" )
+         <> help "Используемая метрика (Euclid или Hamming)"
+         <> value Euclid )
      <*> option auto
          (  long "precision"
          <> short 'p'
          <> metavar "VALUE"
          <> help "Точность вычислений"
          <> value 0.01 )
+     <*> option auto
+         (  long "initializer"
+         <> short 'i'
+         <> metavar "NAME"
+         <> help "Метод инициализации начальных значений (BelongingDegree или Centers)"
+         <> value BelongingDegree )
 
 showInput :: Opts -> IO ()
 showInput opts = do
   csv <- fromFile (input opts) defaultCsvParserOpts
   _ <- case csv of
-    Right c -> putStrLn $ show $ toDouble c
+    Right c -> putStrLn $ show $ toDoublesList c
     Left err -> putStrLn err
   return ()
 

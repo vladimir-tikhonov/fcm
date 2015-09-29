@@ -4,7 +4,7 @@ author:              Vladimir
 category:            Math
 description:         Fuzzy c-means
 build-type:          Simple
-cabal-version:       >=1.8
+cabal-version:       >=1.10
 
 executable fcm
   ghc-options:         -Wall
