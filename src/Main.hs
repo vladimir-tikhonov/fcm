@@ -45,7 +45,7 @@ showInput :: Opts -> IO ()
 showInput opts = do
   csv <- fromFile (input opts) defaultCsvParserOpts
   _ <- case csv of
-    Right c -> putStrLn $ show c
+    Right c -> putStrLn $ show $ toDouble c
     Left err -> putStrLn err
   return ()
 
