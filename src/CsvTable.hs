@@ -21,7 +21,6 @@ data CsvParserOpts = CsvParserOpts {  delimeter     :: Char
 defaultCsvParserOpts :: CsvParserOpts
 defaultCsvParserOpts = CsvParserOpts { delimeter = ',', hasHeader = False, noFirstColumn = False, noLastColumn = False }
 
-
 fromFile :: String -> CsvParserOpts -> IO (Either String (CsvTable Double))
 fromFile path opts = do
    let decodeOpts = DecodeOptions { decDelimiter = fromIntegral (ord $ delimeter opts) }
@@ -30,4 +29,16 @@ fromFile path opts = do
                   then decodeWith decodeOpts HasHeader csvData
                   else decodeWith decodeOpts NoHeader csvData
    case result of Left err -> return (Left err)
-                  Right v ->  return (Right CsvTable { rows = (v :: Table Double) })
+                  Right v ->  do
+                    let t = applyFirstColumnOpts opts $ applyLastColumnOpts opts v
+                    return (Right CsvTable { rows = (t :: Table Double) })
+
+applyFirstColumnOpts :: CsvParserOpts -> Table a -> Table a
+applyFirstColumnOpts (CsvParserOpts _ _ False _) table = table
+applyFirstColumnOpts (CsvParserOpts _ _ True _)  table =
+    V.map V.tail table
+
+applyLastColumnOpts :: CsvParserOpts -> Table a -> Table a
+applyLastColumnOpts (CsvParserOpts _ _ _ False) table = table
+applyLastColumnOpts (CsvParserOpts _ _ _ True)  table =
+    V.map V.init table
