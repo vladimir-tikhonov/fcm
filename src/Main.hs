@@ -1,5 +1,6 @@
 module Main where
 
+import           CsvTable
 import           Options.Applicative
 
 data Opts = Opts
@@ -40,11 +41,16 @@ spec = Opts
          <> help "Точность вычислений"
          <> value 0.01 )
 
-showOpts :: Opts -> IO ()
-showOpts opts = putStrLn $ "Аргументы: " ++ show opts
+showInput :: Opts -> IO ()
+showInput opts = do
+  csv <- fromFile (input opts) defaultCsvParserOpts
+  _ <- case csv of
+    Right c -> putStrLn $ show c
+    Left err -> putStrLn err
+  return ()
 
 main :: IO ()
-main = execParser opts >>= showOpts
+main = execParser opts >>= showInput
  where
    opts = info (helper <*> spec)
      ( fullDesc
