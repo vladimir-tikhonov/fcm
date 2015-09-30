@@ -11,7 +11,7 @@ import           Fcm.Distancies
 import           Fcm.Initialization
 import           Fcm.Types
 
-fcm :: FcmOpts -> ObjectsMatrix -> IO (BelongingMatrix)
+fcm :: FcmOpts -> ObjectsMatrix -> IO BelongingMatrix
 fcm opts x = do
   u <- initMatrix opts x (nrows x)
   let v = calcV u x

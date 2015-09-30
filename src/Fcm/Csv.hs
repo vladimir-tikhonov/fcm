@@ -36,7 +36,7 @@ fromFile path opts = do
 toDoublesMatrix :: Table String -> Matrix Double
 toDoublesMatrix table =
     fromLists doubleList
-    where doublesV = V.map (V.map $ \x -> read x :: Double) $ table
+    where doublesV = V.map (V.map $ \ x -> read x :: Double) table
           doubleList = V.toList $ V.map V.toList doublesV
 
 applyFirstColumnOpts :: CsvParserOpts -> Table a -> Table a
