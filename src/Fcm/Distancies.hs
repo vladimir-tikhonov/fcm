@@ -4,8 +4,7 @@ module Fcm.Distancies (
 ) where
 
 import qualified Data.Vector as V
-
-data DistMethod = Hamming | Euclid deriving(Show, Read)
+import           Fcm.Types
 
 dist :: DistMethod -> V.Vector Double -> V.Vector Double -> Double
 dist Hamming v1 v2 =

@@ -7,7 +7,7 @@ module Fcm.Csv (
 import qualified Data.ByteString.Lazy as BL
 import           Data.Char
 import           Data.Csv
-import           Data.Matrix          as M
+import           Data.Matrix
 import qualified Data.Vector          as V
 
 type Row a = V.Vector a

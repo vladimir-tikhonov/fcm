@@ -4,15 +4,26 @@ module Fcm.Initialization (
 ) where
 
 import           Data.List.Split
-import           Data.Matrix     as M
+import           Data.Matrix
+import qualified Data.Random        as R
+import           Data.Random.Extras
+import           Data.Random.RVar
+import           Fcm.Calculations
 import           Fcm.Types
 import           System.Random
 
-data InitMethod = BelongingDegree | Centers deriving(Show, Read)
+initMatrix :: FcmOpts -> ObjectsMatrix -> RowsCount -> IO (BelongingMatrix)
+initMatrix FcmOpts { initMethod = BelongingDegree, c = nClusters } _ r = randU r nClusters
 
-initMatrix :: InitMethod -> ObjectsMatrix -> RowsCount -> ClustersCount -> IO (BelongingMatrix)
-initMatrix BelongingDegree _ = randU
--- initMatrix Centers =
+initMatrix opts@FcmOpts { initMethod = Centers, c = nClusters } x _ = do
+  v <- randV nClusters x
+  return (calcU v x opts)
+
+randV :: ClustersCount -> ObjectsMatrix -> IO (CentersMatrix)
+randV nClusters x = do
+  randX <- runRVar rvar R.StdRandom
+  return (fromLists randX)
+  where rvar = sample nClusters . toLists $ x
 
 randU :: RowsCount -> ClustersCount -> IO (BelongingMatrix)
 randU nRows nClusters = do
@@ -20,6 +31,6 @@ randU nRows nClusters = do
   let randList = take(nRows * nClusters) . randoms $ gen
       groupedList = chunksOf nClusters randList
       scaledList = map normalizeRow groupedList
-      result = M.fromLists scaledList
+      result = fromLists scaledList
   return (result)
   where normalizeRow row = map (/ (sum row)) row
