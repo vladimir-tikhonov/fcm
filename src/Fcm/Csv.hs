@@ -1,4 +1,4 @@
-module CsvTable (
+module Fcm.Csv (
   defaultCsvParserOpts,
   fromFile,
   toDoublesMatrix

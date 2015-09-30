@@ -1,8 +1,8 @@
 module Main where
 
-import           CsvTable
 import           Data.Matrix         as M
-import           Fcm
+import           Fcm.Csv
+import           Fcm.Fcm
 import           Options.Applicative
 
 data Opts = Opts
@@ -56,8 +56,11 @@ showInput opts = do
   _ <- case csv of
     Right table -> do
       let m = toDoublesMatrix table
-          fcmOpts = FcmOpts { c = clusters opts, e = precision opts, distMethod = metric opts, Fcm.initMethod = Main.initMethod opts }
-      result <- fcmTest fcmOpts m
+          fcmOpts = FcmOpts { c = clusters opts
+                            , e = precision opts
+                            , distMethod = metric opts
+                            , Fcm.Fcm.initMethod = Main.initMethod opts }
+      result <- fcm fcmOpts m
       putStrLn $ prettyMatrix result
       return ()
     Left err -> putStrLn err
