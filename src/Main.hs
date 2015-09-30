@@ -1,16 +1,17 @@
 module Main where
 
 import           CsvTable
+import           Data.Matrix         as M
 import           Fcm
 import           Options.Applicative
 
 data Opts = Opts
-  { input     :: String
-  , output    :: String
-  , clusters  :: Int
-  , metric    :: DistMethod
-  , precision :: Double
-  , init      :: InitMethod
+  { input      :: String
+  , output     :: String
+  , clusters   :: Int
+  , metric     :: DistMethod
+  , precision  :: Double
+  , initMethod :: InitMethod
   } deriving(Show)
 
 spec :: Parser Opts
@@ -53,7 +54,12 @@ showInput :: Opts -> IO ()
 showInput opts = do
   csv <- fromFile (input opts) defaultCsvParserOpts
   _ <- case csv of
-    Right c -> putStrLn $ show $ toDoublesList c
+    Right table -> do
+      let m = toDoublesMatrix table
+          fcmOpts = FcmOpts { c = clusters opts, e = precision opts, distMethod = metric opts, Fcm.initMethod = Main.initMethod opts }
+      result <- fcmTest fcmOpts m
+      putStrLn $ prettyMatrix result
+      return ()
     Left err -> putStrLn err
   return ()
 

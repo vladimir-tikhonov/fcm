@@ -1,12 +1,13 @@
 module CsvTable (
   defaultCsvParserOpts,
   fromFile,
-  toDoublesList
+  toDoublesMatrix
 ) where
 
 import qualified Data.ByteString.Lazy as BL
 import           Data.Char
 import           Data.Csv
+import           Data.Matrix          as M
 import qualified Data.Vector          as V
 
 type Row a = V.Vector a
@@ -32,10 +33,11 @@ fromFile path opts = do
                     let t = applyFirstColumnOpts opts $ applyLastColumnOpts opts v
                     return (Right (t :: Table String) )
 
-toDoublesList :: Table String -> [[Double]]
-toDoublesList table =
-    V.toList $ V.map V.toList doublesV
+toDoublesMatrix :: Table String -> Matrix Double
+toDoublesMatrix table =
+    fromLists doubleList
     where doublesV = V.map (V.map $ \x -> read x :: Double) $ table
+          doubleList = V.toList $ V.map V.toList doublesV
 
 applyFirstColumnOpts :: CsvParserOpts -> Table a -> Table a
 applyFirstColumnOpts (CsvParserOpts _ _ False _) table = table

@@ -15,5 +15,7 @@ executable fcm
                        cassava ==0.4.*,
                        bytestring ==0.10.*,
                        vector ==0.10.*,
-                       matrix ==0.3.*
+                       matrix ==0.3.*,
+                       random ==1.0.*,
+                       split ==0.2.*
   default-language:    Haskell2010
