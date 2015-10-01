@@ -17,7 +17,8 @@ initMatrix FcmOpts { initMethod = BelongingDegree, c = nClusters } _ r = randU r
 
 initMatrix opts@FcmOpts { initMethod = Centers, c = nClusters } x _ = do
   v <- randV nClusters x
-  return (calcU v x opts)
+  let vExt = extendV nClusters v
+  return (calcU vExt x opts)
 
 randV :: ClustersCount -> ObjectsMatrix -> IO CentersMatrix
 randV nClusters x = do
@@ -25,7 +26,12 @@ randV nClusters x = do
   return (fromLists randX)
   where rvar = sample nClusters . toLists $ x
 
-randU :: RowsCount -> ClustersCount -> IO BelongingMatrix
+extendV :: ClustersCount -> CentersMatrix -> CentersMatrix
+extendV nClusters v
+  | nrows v >= nClusters = v
+  | otherwise = v <-> fromLists (replicate (nClusters - nrows v) (replicate (ncols v) 0.0))
+
+randU :: ClustersCount -> ClustersCount -> IO BelongingMatrix
 randU nRows nClusters = do
   gen <- newStdGen
   let randList = take(nRows * nClusters) . randoms $ gen

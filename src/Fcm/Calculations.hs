@@ -1,6 +1,7 @@
 module Fcm.Calculations (
   calcV,
-  calcU
+  calcU,
+  diffM
 ) where
 
 import           Data.Matrix
@@ -38,5 +39,12 @@ calcU v x opts =
 
 replaceNaN :: Double -> Double
 replaceNaN val
-  | isNaN val = fromIntegral (maxBound :: Int) :: Double
+  | isNaN val = 1
   | otherwise = val
+
+diffM :: BelongingMatrix -> BelongingMatrix -> Double
+diffM u1 u2 =
+  maximum elemAbs
+  where diffMatrix = elementwise (-) u1 u2
+        elemList = toList diffMatrix
+        elemAbs = map abs elemList

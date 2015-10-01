@@ -6,10 +6,12 @@ description:         Fuzzy c-means
 build-type:          Simple
 cabal-version:       >=1.10
 
-executable fcm
+library
   ghc-options:         -Wall
-  main-is:             Main.hs
-  hs-source-dirs:      src
+  exposed-modules:     Fcm.Distancies,
+                       Fcm.Types,
+                       Fcm.Calculations,
+                       Fcm.Initialization
   build-depends:       base ==4.6.*,
                        optparse-applicative ==0.12.*,
                        cassava ==0.4.*,
@@ -20,4 +22,34 @@ executable fcm
                        split ==0.2.*,
                        random-extras ==0.19.*,
                        random-fu ==0.2.*
+  hs-source-dirs:      src
+  default-language:    Haskell2010
+
+executable fcm
+  ghc-options:         -Wall
+  main-is:             Main.hs
+  hs-source-dirs:      src
+  build-depends:       base ==4.6.*,
+                       fcm ==0.1.*,
+                       optparse-applicative ==0.12.*,
+                       cassava ==0.4.*,
+                       bytestring ==0.10.*,
+                       vector ==0.10.*,
+                       matrix ==0.3.*,
+                       random ==1.0.*,
+                       split ==0.2.*,
+                       random-extras ==0.19.*,
+                       random-fu ==0.2.*
+  default-language:    Haskell2010
+
+test-suite tests
+  ghc-options:         -Wall
+  type:                exitcode-stdio-1.0
+  main-is:             Tests.hs
+  hs-source-dirs:      tests
+  build-depends:       base ==4.6.*,
+                       fcm ==0.1.*,
+                       hspec ==2.0.*,
+                       vector ==0.10.*,
+                       matrix ==0.3.*
   default-language:    Haskell2010
