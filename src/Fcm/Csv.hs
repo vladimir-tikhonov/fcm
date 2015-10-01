@@ -1,6 +1,6 @@
 module Fcm.Csv (
   defaultCsvParserOpts,
-  fromString,
+  builsFromString,
   toDoublesMatrix
 ) where
 
@@ -23,8 +23,8 @@ data CsvParserOpts = CsvParserOpts {  delimeter     :: Char
 defaultCsvParserOpts :: CsvParserOpts
 defaultCsvParserOpts = CsvParserOpts { delimeter = ',', hasHeader = False, noFirstColumn = False, noLastColumn = True }
 
-fromString :: String -> CsvParserOpts -> IO (Either String (Table String))
-fromString csvData opts = do
+builsFromString :: String -> CsvParserOpts -> IO (Either String (Table String))
+builsFromString csvData opts = do
   let decodeOpts = DecodeOptions { decDelimiter = fromIntegral (ord $ delimeter opts) }
       csvBytes = BL.pack . unpackBytes . pack $ csvData
 

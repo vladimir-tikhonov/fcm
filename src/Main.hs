@@ -1,8 +1,10 @@
 module Main where
 
 import           Data.Matrix         as M
+import           Data.Strings
 import           Fcm.Csv
 import           Fcm.Fcm
+import           Fcm.Types
 import           Options.Applicative
 import           System.IO
 
@@ -56,17 +58,23 @@ process opts = do
   handle <- openFile (input opts) ReadMode
   hSetEncoding handle utf8_bom
   contents <- hGetContents handle
-  csv <- fromString contents defaultCsvParserOpts
+  csv <- builsFromString contents defaultCsvParserOpts
   _ <- case csv of
     Right table -> do
       let x = toDoublesMatrix table
           fcmOpts = buildFcmOpts opts
       result <- fcm fcmOpts x
-      putStrLn $ prettyMatrix result
-      return ()
+      logResult opts result
     Left err -> putStrLn err
   hClose handle
   return ()
+
+logResult :: Opts -> BelongingMatrix -> IO()
+logResult opts u
+  | strNull outputPath = putStrLn resultStr
+  | otherwise = writeFile outputPath resultStr
+  where resultStr = prettyMatrix u
+        outputPath = output opts
 
 buildFcmOpts :: Opts -> FcmOpts
 buildFcmOpts opts = FcmOpts { c = clusters opts
