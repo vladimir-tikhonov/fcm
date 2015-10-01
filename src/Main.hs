@@ -58,7 +58,7 @@ process opts = do
   handle <- openFile (input opts) ReadMode
   hSetEncoding handle utf8_bom
   contents <- hGetContents handle
-  csv <- builsFromString contents defaultCsvParserOpts
+  csv <- buildFromString contents defaultCsvParserOpts
   _ <- case csv of
     Right table -> do
       let x = toDoublesMatrix table
