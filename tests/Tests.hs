@@ -53,11 +53,8 @@ main = hspec $ do
         it "returns matrix with nClusters columns" $ do
           u <- initMatrix opts x nRows
           ncols u `shouldBe` (nClusters :: Int)
-        it "returns matrix with each row's sum eq 1" $ do
-          u <- initMatrix opts x nRows
-          let list = toLists u
-              sums = map (round . sum) list
-          sums `shouldBe` replicate nRows (1 :: Int)
+        it "returns matrix with each row's sum eq 1" $
+          assertBuildValidUMatrix opts x nRows
 
       describe "BelongingDegree" $ do
         let nClusters = 5
@@ -67,8 +64,12 @@ main = hspec $ do
         it "returns matrix with nClusters columns" $ do
           u <- initMatrix opts x nRows
           ncols u `shouldBe` (nClusters :: Int)
-        it "returns matrix with each row's sum eq 1" $ do
-          u <- initMatrix opts x nRows
-          let list = toLists u
-              sums = map (round . sum) list
-          sums `shouldBe` replicate nRows (1 :: Int)
+        it "returns matrix with each row's sum eq 1" $
+          assertBuildValidUMatrix opts x nRows
+
+assertBuildValidUMatrix :: FcmOpts -> ObjectsMatrix -> RowsCount -> Expectation
+assertBuildValidUMatrix opts x nRows = do
+  u <- initMatrix opts x nRows
+  let list = toLists u
+      sums = map (round . sum) list
+  sums `shouldBe` replicate nRows (1 :: Int)

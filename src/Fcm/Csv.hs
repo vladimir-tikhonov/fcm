@@ -1,14 +1,16 @@
 module Fcm.Csv (
   defaultCsvParserOpts,
-  fromFile,
+  fromString,
   toDoublesMatrix
 ) where
 
-import qualified Data.ByteString.Lazy as BL
+import           Data.ByteString.Char8    (pack)
+import           Data.ByteString.Internal (unpackBytes)
+import qualified Data.ByteString.Lazy     as BL
 import           Data.Char
 import           Data.Csv
 import           Data.Matrix
-import qualified Data.Vector          as V
+import qualified Data.Vector              as V
 
 type Row a = V.Vector a
 type Table a = V.Vector (Row a)
@@ -21,15 +23,16 @@ data CsvParserOpts = CsvParserOpts {  delimeter     :: Char
 defaultCsvParserOpts :: CsvParserOpts
 defaultCsvParserOpts = CsvParserOpts { delimeter = ',', hasHeader = False, noFirstColumn = False, noLastColumn = True }
 
-fromFile :: String -> CsvParserOpts -> IO (Either String (Table String))
-fromFile path opts = do
-   let decodeOpts = DecodeOptions { decDelimiter = fromIntegral (ord $ delimeter opts) }
-   csvData <- BL.readFile path
-   let result = if hasHeader opts
-                  then decodeWith decodeOpts HasHeader csvData
-                  else decodeWith decodeOpts NoHeader csvData
-   case result of Left err -> return (Left err)
-                  Right v ->  do
+fromString :: String -> CsvParserOpts -> IO (Either String (Table String))
+fromString csvData opts = do
+  let decodeOpts = DecodeOptions { decDelimiter = fromIntegral (ord $ delimeter opts) }
+      csvBytes = BL.pack . unpackBytes . pack $ csvData
+
+  let result = if hasHeader opts
+                  then decodeWith decodeOpts HasHeader csvBytes
+                  else decodeWith decodeOpts NoHeader csvBytes
+  case result of Left err -> return (Left err)
+                 Right v ->  do
                     let t = applyFirstColumnOpts opts $ applyLastColumnOpts opts v
                     return (Right (t :: Table String) )
 
