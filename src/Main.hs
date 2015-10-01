@@ -1,5 +1,6 @@
 module Main where
 
+import           Control.Exception
 import           Data.Matrix         as M
 import           Data.Strings
 import           Fcm.Csv
@@ -7,6 +8,7 @@ import           Fcm.Fcm
 import           Fcm.Types
 import           Options.Applicative
 import           System.IO
+import           System.IO.Error
 
 data Opts = Opts
   { input      :: String
@@ -55,18 +57,20 @@ spec = Opts
 
 process :: Opts -> IO ()
 process opts = do
-  handle <- openFile (input opts) ReadMode
-  hSetEncoding handle utf8_bom
-  contents <- hGetContents handle
+  h <- openFile (input opts) ReadMode
+  hSetEncoding h utf8_bom
+  contents <- hGetContents h
   csv <- buildFromString contents defaultCsvParserOpts
-  _ <- case csv of
+  case csv of
     Right table -> do
       let x = toDoublesMatrix table
           fcmOpts = buildFcmOpts opts
       result <- fcm fcmOpts x
       logResult opts result
+
     Left err -> putStrLn err
-  hClose handle
+
+  hClose h
   return ()
 
 logResult :: Opts -> BelongingMatrix -> IO()
@@ -83,9 +87,17 @@ buildFcmOpts opts = FcmOpts { c = clusters opts
                   , Fcm.Fcm.initMethod = Main.initMethod opts }
 
 main :: IO ()
-main = execParser opts >>= process
- where
-   opts = info (helper <*> spec)
+main = do
+  opts <- execParser parserOpts
+  process opts `catch` handler
+  where
+   parserOpts = info (helper <*> spec)
      ( fullDesc
     <> progDesc "Кластеризует переданные данные методом FCM"
     <> header "fcm - утилита для кластеризации данных" )
+
+handler :: IOError -> IO ()
+handler ex
+  | isDoesNotExistError ex = putStrLn "Указанный файл не найден."
+  | isPermissionError ex = putStrLn "Недостаточно прав для доступа к файлу."
+  | otherwise = ioError ex
