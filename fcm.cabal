@@ -12,7 +12,7 @@ library
                        Fcm.Types,
                        Fcm.Calculations,
                        Fcm.Initialization
-  build-depends:       base ==4.6.*,
+  build-depends:       base ==4.*,
                        optparse-applicative ==0.12.*,
                        cassava ==0.4.*,
                        bytestring ==0.10.*,
@@ -30,7 +30,7 @@ executable fcm
   ghc-options:         -Wall
   main-is:             Main.hs
   hs-source-dirs:      src
-  build-depends:       base ==4.6.*,
+  build-depends:       base ==4.*,
                        fcm ==0.1.*,
                        optparse-applicative ==0.12.*,
                        cassava ==0.4.*,
