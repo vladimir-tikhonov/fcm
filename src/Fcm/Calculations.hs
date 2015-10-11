@@ -19,7 +19,7 @@ calcV m x =
         scaledObject i l = scaleMatrix (scaledElem i l) (xRow i) -- (μ_il)^m * X_i
         scaledObjects l = map (`scaledObject` l) [1..n] -- [ (μ_il)^m * X_i ], i = 1..n
         scaledObjectsSum l = foldr1 matrixSum (scaledObjects l) -- Sum [ .. ]
-        centerScaleCoef l = 1 / V.sum (getCol l m) -- Sum (μ_il)
+        centerScaleCoef l = 1 / V.sum (V.map (** 2) (getCol l m)) -- Sum (μ_il ^ m)
         centerMatricies = map (\l -> scaleMatrix (centerScaleCoef l) (scaledObjectsSum l) ) [1..ncols m]
 
 calcU :: CentersMatrix -> ObjectsMatrix -> FcmOpts -> BelongingMatrix
